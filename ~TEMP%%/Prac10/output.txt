@@ -1,0 +1,55 @@
+PRACTICAL 10: REGISTER ALLOCATION USING GRAPH COLORING
+
+Input Three Address Code:
+
+100: t1=a+b
+101: t2=c-d
+102: t3=t1*t2
+103: z=t3;
+104: x=y;
+
+Interference Graph Edges:
+  t1 -- t2
+  t1 -- c
+  t1 -- d
+  t1 -- y
+  a -- b
+  a -- c
+  a -- d
+  a -- y
+  b -- c
+  b -- d
+  b -- y
+  t2 -- y
+  c -- d
+  c -- y
+  d -- y
+  t3 -- y
+  z -- y
+
+Register Allocation (Greedy Graph Coloring, 4 registers):
+  t1         -> R3
+  a          -> SPILL (memory)
+  b          -> R3
+  t2         -> R1
+  c          -> R2
+  d          -> R1
+  t3         -> R1
+  z          -> R1
+  x          -> R0
+  y          -> R0
+
+Generated Register-Based Pseudo-Assembly:
+
+  ; Three-operand instruction format: OP destination, source1, source2
+  ; S0-S2 are scratch registers used only for spilled values.
+
+100: t1=a+b
+    LOAD S0, [a]
+    ADD R3, S0, R3
+101: t2=c-d
+    SUB R1, R2, R1
+102: t3=t1*t2
+    MUL R1, R3, R1
+103: z=t3;
+104: x=y;
